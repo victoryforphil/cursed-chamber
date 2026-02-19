@@ -51,6 +51,10 @@ DRY_RUN=false
 VERBOSE=false
 NO_BUNDLE=false
 
+TAURI_CONF_PATH="$REPO_ROOT/packages/desktop/src-tauri/tauri.conf.json"
+PRODUCT_NAME="$(node -e "const fs=require('fs');const cfg=JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));process.stdout.write(cfg.productName || 'OpenChamber');" "$TAURI_CONF_PATH")"
+APP_BUNDLE_NAME="${PRODUCT_NAME}.app"
+
 # Logging functions
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -209,7 +213,52 @@ run_native_build() {
             TAURI_ARGS+=" --verbose"
         fi
 
-        bun run --cwd packages/desktop tauri build $TAURI_ARGS
+        if ! bun run --cwd packages/desktop tauri build $TAURI_ARGS; then
+            if [[ "$NO_BUNDLE" == true ]]; then
+                log_error "Build failed for $target"
+                exit 1
+            fi
+
+            log_warn "Default DMG bundling failed for $target. Retrying with APFS fallback..."
+
+            local APP_DIR="$REPO_ROOT/packages/desktop/src-tauri/target/$target/release/bundle/macos"
+            local DMG_DIR="$REPO_ROOT/packages/desktop/src-tauri/target/$target/release/bundle/dmg"
+            local BUNDLE_DMG_SCRIPT="$DMG_DIR/bundle_dmg.sh"
+            local ICON_PATH="$DMG_DIR/icon.icns"
+            local FALLBACK_DMG_NAME="${PRODUCT_NAME}_${target}_apfs.dmg"
+
+            if [[ ! -d "$APP_DIR/$APP_BUNDLE_NAME" ]]; then
+                log_error "APFS fallback aborted: app bundle not found at $APP_DIR/$APP_BUNDLE_NAME"
+                exit 1
+            fi
+
+            if [[ ! -x "$BUNDLE_DMG_SCRIPT" ]]; then
+                log_error "APFS fallback aborted: bundle script not found at $BUNDLE_DMG_SCRIPT"
+                exit 1
+            fi
+
+            if [[ ! -f "$ICON_PATH" ]]; then
+                log_error "APFS fallback aborted: icon file not found at $ICON_PATH"
+                exit 1
+            fi
+
+            (
+                cd "$APP_DIR"
+                "$BUNDLE_DMG_SCRIPT" \
+                    --volname "$PRODUCT_NAME" \
+                    --icon "$APP_BUNDLE_NAME" 180 170 \
+                    --app-drop-link 480 170 \
+                    --window-size 660 400 \
+                    --skip-jenkins \
+                    --hide-extension "$APP_BUNDLE_NAME" \
+                    --volicon "$ICON_PATH" \
+                    --filesystem APFS \
+                    "$FALLBACK_DMG_NAME" \
+                    "$APP_BUNDLE_NAME"
+            )
+
+            log_success "APFS DMG fallback succeeded for $target"
+        fi
 
         log_success "Successfully built for $target"
     done

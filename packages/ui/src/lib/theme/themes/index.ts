@@ -8,7 +8,7 @@ export const flexokiLightTheme = withPrColors(flexokiLightRaw as Theme);
 export const flexokiDarkTheme = withPrColors(flexokiDarkRaw as Theme);
 
 export const DEFAULT_LIGHT_THEME_ID = 'flexoki-light' as const;
-export const DEFAULT_DARK_THEME_ID = 'flexoki-dark' as const;
+export const DEFAULT_DARK_THEME_ID = 'vfp-caution' as const;
 
 export const themes: Theme[] = [flexokiLightTheme, flexokiDarkTheme, ...presetThemes];
 

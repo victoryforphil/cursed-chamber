@@ -27,7 +27,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DEFAULT_PORT = 3000;
-const DESKTOP_NOTIFY_PREFIX = '[OpenChamberDesktopNotify] ';
+const DESKTOP_NOTIFY_PREFIX = '[CursedChamberDesktopNotify] ';
 const uiNotificationClients = new Set();
 const HEALTH_CHECK_INTERVAL = 15000;
 const SHUTDOWN_TIMEOUT = 10000;
@@ -258,7 +258,7 @@ const resolveWorkspacePath = (targetPath, baseDirectory) => {
     return { ok: true, base: resolvedBase, resolved };
   }
 
-  // Allow writing OpenChamber per-project config under ~/.config/openchamber.
+  // Allow writing CursedChamber per-project config under ~/.config/openchamber.
   // LEGACY_PROJECT_CONFIG: migration target root; allowed outside workspace.
   if (isPathWithinRoot(resolved, OPENCHAMBER_USER_CONFIG_ROOT)) {
     return { ok: true, base: path.resolve(OPENCHAMBER_USER_CONFIG_ROOT), resolved };
@@ -5484,7 +5484,7 @@ async function main(options = {}) {
     exitOnShutdown = options.exitOnShutdown;
   }
 
-  console.log(`Starting OpenChamber on port ${port === 0 ? 'auto' : port}`);
+  console.log(`Starting CursedChamber on port ${port === 0 ? 'auto' : port}`);
 
   // Check macOS Say TTS availability once at startup
   let sayTTSCapability = { available: false, voices: [], reason: 'Not checked' };
@@ -6162,7 +6162,7 @@ async function main(options = {}) {
             timeout /t 2 /nobreak >nul
             ${updateCmd}
             if %ERRORLEVEL% EQU 0 (
-              echo Update successful, restarting OpenChamber...
+              echo Update successful, restarting CursedChamber...
               ${restartCmd}
             ) else (
               echo Update failed
@@ -6173,7 +6173,7 @@ async function main(options = {}) {
             sleep 2
             ${updateCmd}
             if [ $? -eq 0 ]; then
-              echo "Update successful, restarting OpenChamber..."
+              echo "Update successful, restarting CursedChamber..."
               ${restartCmd}
             else
               echo "Update failed"
@@ -10007,7 +10007,7 @@ Context:
       // Worktrees are an optional feature. Avoid repeated 500s (and repeated client retries)
       // when the directory isn't a git repo or uses shell shorthand like "~/".
       console.warn('Failed to get worktrees, returning empty list:', error?.message || error);
-      res.setHeader('X-OpenChamber-Warning', 'git worktrees unavailable');
+      res.setHeader('X-CursedChamber-Warning', 'git worktrees unavailable');
       res.json([]);
     }
   });
@@ -11471,7 +11471,7 @@ Context:
         // ignore
       }
 
-      console.log(`OpenChamber server running on port ${activePort}`);
+      console.log(`CursedChamber server running on port ${activePort}`);
       console.log(`Health check: http://localhost:${activePort}/health`);
       console.log(`Web interface: http://localhost:${activePort}`);
 

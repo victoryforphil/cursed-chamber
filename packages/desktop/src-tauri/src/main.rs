@@ -961,7 +961,7 @@ fn is_app_bundle_installed(bundle_name: &str) -> bool {
 }
 
 const SIDECAR_NAME: &str = "openchamber-server";
-const SIDECAR_NOTIFY_PREFIX: &str = "[OpenChamberDesktopNotify] ";
+const SIDECAR_NOTIFY_PREFIX: &str = "[CursedChamberDesktopNotify] ";
 const HEALTH_TIMEOUT: Duration = Duration::from_secs(20);
 const HEALTH_POLL_INTERVAL: Duration = Duration::from_millis(250);
 
@@ -1468,7 +1468,7 @@ fn maybe_show_sidecar_notification(app: &tauri::AppHandle, payload: SidecarNotif
     let title = payload
         .title
         .filter(|t| is_nonempty_string(t))
-        .unwrap_or_else(|| "OpenChamber".to_string());
+        .unwrap_or_else(|| "CursedChamber".to_string());
     let body = payload.body.filter(|b| is_nonempty_string(b));
     let _tag = payload.tag;
 
@@ -1819,7 +1819,7 @@ fn desktop_notify(
     let mut builder = app
         .notification()
         .builder()
-        .title(payload.title.unwrap_or_else(|| "OpenChamber".to_string()));
+        .title(payload.title.unwrap_or_else(|| "CursedChamber".to_string()));
 
     if let Some(body) = payload.body {
         if is_nonempty_string(&body) {
@@ -2212,7 +2212,7 @@ fn create_window(app: &tauri::AppHandle, url: &str, local_origin: &str, restore_
     };
 
     let mut builder = WebviewWindowBuilder::new(app, &label, WebviewUrl::External(parsed))
-        .title("OpenChamber")
+        .title("CursedChamber")
         .inner_size(1280.0, 800.0)
         .min_inner_size(MIN_WINDOW_WIDTH as f64, MIN_WINDOW_HEIGHT as f64)
         .decorations(true)
